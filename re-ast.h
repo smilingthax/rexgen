@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <memory>
-#include <typeinfo>
 #include <unordered_map>
+//#include <typeinfo>
 
 namespace Regex {
 

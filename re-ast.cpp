@@ -1,146 +1,112 @@
-#include "re-ast.h"
-#include <stdio.h>
+#include "re-ast_int.h"
 #include <assert.h>
-#include "hash-algo.h"
 #include "merge-sorted.h"
+
+// #include <typeinfo>
+#include <string.h>
 
 namespace Regex {
 
 namespace detail {
 
-struct Literal;
-struct Sequence;
-struct Alternative;
-struct Repetition;
+void Literal::calculate_hash()
+{
+  HashAlgo h;
+  h("Literal",8);
+  const char *name=typeid(*data).name();
+  h(name,strlen(name)+1);
+  auto val=data->hash();
+  h(&val,sizeof(val));
+  hash=(HashAlgo::result_type)h;
+}
 
-struct Node {
-  using HashAlgo=fnv1a;
-
-  virtual ~Node()=default;
-
-  virtual void addTo(Sequence &s) const;
-  virtual void addTo(Alternative &a) const;
-  virtual void addTo(Repetition &a) const;
-
-  virtual bool operator==(const Node &rhs) const =0;
-  bool operator!=(const Node &rhs) const { return !(*this==rhs); }
-
-  // full hash (preorder)
-//  virtual void hash_append(std::function<void(const void *,std::size_t)> &h) const =0;  // (HashAlgo &h)
-  // "merkle" tree hash
-  HashAlgo::result_type hash; // must match hash_result_t
-
-//  expression_t id=-1;
-};
-
-struct Literal : Node {
-  Literal(std::unique_ptr<LiteralBase> &&data) : data(std::move(data)) { }
-
-  std::unique_ptr<LiteralBase> data;
-
-  void calculate_hash() {
-    HashAlgo h;
-    h("Literal",8);
-    auto val=data->hash();
-    h(&val,sizeof(val));
-    hash=(HashAlgo::result_type)h;
+bool Literal::operator==(const Node &rhs) const
+{
+  if (auto rt=dynamic_cast<const Literal *>(&rhs)) {
+    return (*data==*rt->data);
   }
-  bool operator==(const Node &rhs) const override {
-    if (auto rt=dynamic_cast<const Literal *>(&rhs)) {
-      return (*data==*rt->data);
-    }
-    return false;
-  }
-};
-
-struct Sequence : Node {
-  void addTo(Sequence &s) const override;
-
-  std::vector<const Node *> childs;
+  return false;
+}
 
 /*
-  void hash_append(HashAlgo &h) const override {
-    h("Sequence",9);
-    for (auto child : childs) {
-      child->hash_append(h);
-    }
+void Sequence::hash_append(HashAlgo &h) const override
+{
+  h("Sequence",9);
+  for (auto child : childs) {
+    child->hash_append(h);
   }
+}
 */
-  void calculate_hash() {
-    HashAlgo h;
-    h("Sequence",9);
-    for (auto child : childs) {
-      h(&child->hash,sizeof(child->hash));
-    }
-    hash=(HashAlgo::result_type)h;
-  }
-  bool operator==(const Node &rhs) const override {
-    if (auto rt=dynamic_cast<const Sequence *>(&rhs)) {
-      if (childs.size()!=rt->childs.size()) {
-        return false;
-      }
-      for (size_t i=0; i<childs.size(); i++) {
-        if (childs[i]!=rt->childs[i]) { // by ptr
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-};
-
-struct Alternative : Node {
-  void addTo(Alternative &a) const override;
-
-  std::vector<const Node *> childs;
-
-  void calculate_hash() {
-    HashAlgo h;
-    h("Alternative",12);
-    for (auto child : childs) {
-      h(&child->hash,sizeof(child->hash));
-    }
-    hash=(HashAlgo::result_type)h;
-  }
-  bool operator==(const Node &rhs) const override {
-    if (auto rt=dynamic_cast<const Alternative *>(&rhs)) {
-      if (childs.size()!=rt->childs.size()) {
-        return false;
-      }
-      for (size_t i=0; i<childs.size(); i++) {
-        if (childs[i]!=rt->childs[i]) { // by ptr
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-};
-
-struct Repetition : Node {
-  Repetition(int min,int max) : child(nullptr),min(min),max(max) {}
-  void addTo(Repetition &s) const override;
-
-  const Node *child;
-  int min,max;
-
-  void calculate_hash() {
-    HashAlgo h;
-    h("Repetition",11);
-    h(&min,sizeof(min));
-    h(&max,sizeof(max));
+void Sequence::calculate_hash()
+{
+  HashAlgo h;
+  h("Sequence",9);
+  for (auto child : childs) {
     h(&child->hash,sizeof(child->hash));
-    hash=(HashAlgo::result_type)h;
   }
-  bool operator==(const Node &rhs) const override {
-    if (auto rt=dynamic_cast<const Repetition *>(&rhs)) {
-      return (min==rt->min)&&(max==rt->max)&&(child==rt->child);
+  hash=(HashAlgo::result_type)h;
+}
+
+bool Sequence::operator==(const Node &rhs) const
+{
+  if (auto rt=dynamic_cast<const Sequence *>(&rhs)) {
+    if (childs.size()!=rt->childs.size()) {
+      return false;
     }
-    return false;
+    for (size_t i=0; i<childs.size(); i++) {
+      if (childs[i]!=rt->childs[i]) { // by ptr
+        return false;
+      }
+    }
+    return true;
   }
-};
+  return false;
+}
+
+void Alternative::calculate_hash()
+{
+  HashAlgo h;
+  h("Alternative",12);
+  for (auto child : childs) {
+    h(&child->hash,sizeof(child->hash));
+  }
+  hash=(HashAlgo::result_type)h;
+}
+
+bool Alternative::operator==(const Node &rhs) const
+{
+  if (auto rt=dynamic_cast<const Alternative *>(&rhs)) {
+    if (childs.size()!=rt->childs.size()) {
+      return false;
+    }
+    for (size_t i=0; i<childs.size(); i++) {
+      if (childs[i]!=rt->childs[i]) { // by ptr
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+void Repetition::calculate_hash()
+{
+  HashAlgo h;
+  h("Repetition",11);
+  h(&min,sizeof(min));
+  h(&max,sizeof(max));
+  h(&child->hash,sizeof(child->hash));
+  hash=(HashAlgo::result_type)h;
+}
+
+bool Repetition::operator==(const Node &rhs) const
+{
+  if (auto rt=dynamic_cast<const Repetition *>(&rhs)) {
+    return (min==rt->min)&&(max==rt->max)&&(child==rt->child);
+  }
+  return false;
+}
+
 
 void Node::addTo(Sequence &s) const
 {

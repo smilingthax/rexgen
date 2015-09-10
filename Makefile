@@ -40,6 +40,6 @@ clean:
 #$(EXEC): $(OBJECTS)
 #	$(CXX) -o $@ $^ $(LDFLAGS)
 
-test-ast: test-ast.cpp re-ast.o
+test-ast: test-ast.o re-ast.o
 	$(CXX) -o $@ $^ $(LDFLAGS)  $(CPPFLAGS) $(CXXFLAGS)
 

@@ -1,6 +1,8 @@
 #ifndef _MERGE_SORTED_H
 #define _MERGE_SORTED_H
 
+// #include <functional>
+
 /* Usage:
 
   // a and b must iterators to sorted ranges
