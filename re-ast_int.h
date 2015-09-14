@@ -8,19 +8,22 @@ namespace Regex {
 
 namespace detail {
 
+using Visitor=ExpressionPool::Visitor;
+
+struct Empty;
 struct Literal;
+struct Repetition;
 struct Sequence;
 struct Alternative;
-struct Repetition;
 
 struct Node {
   using HashAlgo=fnv1a;
 
   virtual ~Node()=default;
 
+  virtual void addTo(Repetition &a) const;
   virtual void addTo(Sequence &s) const;
   virtual void addTo(Alternative &a) const;
-  virtual void addTo(Repetition &a) const;
 
   virtual bool operator==(const Node &rhs) const =0;
   bool operator!=(const Node &rhs) const { return !(*this==rhs); }
@@ -30,7 +33,24 @@ struct Node {
   // "merkle" tree hash
   HashAlgo::result_type hash; // must match hash_result_t
 
-//  expression_t id=-1;
+  virtual void visit(Visitor &visitor) const =0;
+
+  expression_t id=-1;
+
+protected:
+  void setCurrent(Visitor &visitor) const {
+    visitor.current=id;
+  }
+};
+
+struct Empty : Node {
+  Empty() { hash=0; }
+  void addTo(Repetition &a) const override;
+  void addTo(Sequence &s) const override;
+
+  bool operator==(const Node &rhs) const override;
+
+  void visit(Visitor &visitor) const override;
 };
 
 struct Literal : Node {
@@ -40,24 +60,8 @@ struct Literal : Node {
 
   void calculate_hash();
   bool operator==(const Node &rhs) const override;
-};
 
-struct Sequence : Node {
-  void addTo(Sequence &s) const override;
-
-  std::vector<const Node *> childs;
-
-  void calculate_hash();
-  bool operator==(const Node &rhs) const override;
-};
-
-struct Alternative : Node {
-  void addTo(Alternative &a) const override;
-
-  std::vector<const Node *> childs;
-
-  void calculate_hash();
-  bool operator==(const Node &rhs) const override;
+  void visit(Visitor &visitor) const override;
 };
 
 struct Repetition : Node {
@@ -69,6 +73,30 @@ struct Repetition : Node {
 
   void calculate_hash();
   bool operator==(const Node &rhs) const override;
+
+  void visit(Visitor &visitor) const override;
+};
+
+struct Sequence : Node {
+  void addTo(Sequence &s) const override;
+
+  std::vector<const Node *> childs;
+
+  void calculate_hash();
+  bool operator==(const Node &rhs) const override;
+
+  void visit(Visitor &visitor) const override;
+};
+
+struct Alternative : Node {
+  void addTo(Alternative &a) const override;
+
+  std::vector<const Node *> childs;
+
+  void calculate_hash();
+  bool operator==(const Node &rhs) const override;
+
+  void visit(Visitor &visitor) const override;
 };
 
 } // namespace detail

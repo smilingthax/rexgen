@@ -1,4 +1,4 @@
-SOURCES=re-ast.cpp test-ast.cpp
+SOURCES=re-ast.cpp re-dump.cpp test-ast.cpp
 EXEC=test-ast
 PACKAGES=
 
@@ -29,7 +29,7 @@ ifneq "$(MAKECMDGOALS)" "clean"
 endif
 
 clean:
-	rm -f $(EXEC) $(OBJECTS) $(DEPENDS) test-ccxxread triegencxx
+	rm -f $(EXEC) $(OBJECTS) $(DEPENDS)
 
 %.d: %.c
 	@$(CC) $(CPPFLAGS) -MM -MT"$@" -MT"$*.o" -o $@ $<  2> /dev/null
@@ -40,6 +40,6 @@ clean:
 #$(EXEC): $(OBJECTS)
 #	$(CXX) -o $@ $^ $(LDFLAGS)
 
-test-ast: test-ast.o re-ast.o
+test-ast: test-ast.o re-ast.o re-dump.o
 	$(CXX) -o $@ $^ $(LDFLAGS)  $(CPPFLAGS) $(CXXFLAGS)
 
