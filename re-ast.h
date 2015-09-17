@@ -13,6 +13,8 @@ namespace Regex {
 typedef unsigned int expression_t;
 
 namespace detail {
+  constexpr expression_t none=-1;
+
   struct Node;
 } // namespace detail
 
@@ -57,19 +59,20 @@ public:
   virtual void literal(const detail::LiteralBase *lb) {}
 
 /* TODO ... not yet
-  virtual bool preGroup() { return true; }
+  virtual bool preGroup(expression_t cid) { return true; }
   virtual void postGroup() {}
 */
 
-  virtual bool preRepetition(int min,int max) { return true; }
+  virtual bool preRepetition(int min,int max,expression_t cid) { return true; }
   virtual void postRepetition(int min,int max) {}
 
+  // NOTE: AST will never call preXXX when there's no child before postXXX
   virtual bool preSequence() { return true; }
-  virtual bool nextSequence(int idx) { return true; }
+  virtual bool nextSequence(int idx,expression_t cid) { return true; }
   virtual void postSequence() {}
 
   virtual bool preAlternative() { return true; }
-  virtual bool nextAlternative(int idx) { return true; }
+  virtual bool nextAlternative(int idx,expression_t cid) { return true; }
   virtual void postAlternative() {}
 
   virtual void end() {} // convenience
@@ -91,8 +94,7 @@ public:
 
   void empty() override;
   void literal(detail::LiteralBase *lb) override;
-
-// TODO?!   void expression(expression_t e);  // [non-override]
+  void expression(expression_t e); // non-override; (and supports detail::none)
 
   // caller has to provide alternative_t/sequence_t/group_t storage
 // FIXME: not supported in AST yet
@@ -101,6 +103,7 @@ public:
 
   void rep(int min=0,int max=-1) override;
 
+  // as a special extension, this builder handles None/missing
   void begin(sequence_t &s) override;
   void seq(sequence_t &s) override;
   void end(sequence_t &s) override;
@@ -109,11 +112,15 @@ public:
   void alt(alternative_t &a) override;
   void end(alternative_t &a) override;
 
+  // NOTE: unfinished group_t/... will only be destroyed by ~Opaque
   void end() override;
 
-  operator expression_t() {
+  // more non-overrides:
+  operator expression_t() const {
     return current;
   }
+
+  expression_t release(); // or None;  can be used together with expression() to reuse that subtree
 
 protected:
   bool isNone() const;

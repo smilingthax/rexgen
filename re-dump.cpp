@@ -9,11 +9,13 @@ public:
 // FIXME
 if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
     printf("%d:[%s]",id(),s->value.c_str());
+} else if (auto c=dynamic_cast<const Regex::detail::LiteralWrapper<char> *>(lb)) {
+    printf("%d:[%c]",id(),c->value);
 } else
     printf("%d:[]",id());
   }
 
-  bool preRepetition(int min,int max) override {
+  bool preRepetition(int min,int max,expression_t cid) override {
     printf(" (");
     return true;
   }
@@ -27,7 +29,7 @@ if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
     return true;
   }
 
-  bool nextSequence(int idx) override {
+  bool nextSequence(int idx,expression_t cid) override {
     if (idx>0) printf(" ");
     return true;
   }
@@ -40,7 +42,7 @@ if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
     return true;
   }
 
-  bool nextAlternative(int idx) override {
+  bool nextAlternative(int idx,expression_t cid) override {
     if (idx>0) {
       printf(" | ");
     }

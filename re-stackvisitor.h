@@ -52,8 +52,8 @@ public:
     builder.literal(lb->clone());
   }
 
-/*
-  bool preGroup() override { return true; }
+/* TODO ... not yet
+  bool preGroup(expression_t cid) override { return true; }
   void postGroup() override {}
 */
 
@@ -66,7 +66,7 @@ public:
     builder.begin(s);
     current()=std::move(s);
   }
-  bool nextSequence(int idx) override {
+  bool nextSequence(int idx,expression_t cid) override {
     if (idx>0) {
       Builder_base::sequence_t s(std::move(current()));
       builder.seq(s);
@@ -85,7 +85,7 @@ public:
     builder.begin(a);
     current()=std::move(a);
   }
-  bool nextAlternative(int idx) override {
+  bool nextAlternative(int idx,expression_t cid) override {
     if (idx>0) {
       Builder_base::alternative_t a(std::move(current()));
       builder.alt(a);

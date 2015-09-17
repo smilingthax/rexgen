@@ -69,7 +69,7 @@ bool Repetition::operator==(const Node &rhs) const
 void Repetition::visit(Visitor &visitor) const
 {
   setCurrent(visitor);
-  if (visitor.preRepetition(min,max)) {
+  if (visitor.preRepetition(min,max,child->id)) {
     child->visit(visitor);
     setCurrent(visitor);
     visitor.postRepetition(min,max);
@@ -116,7 +116,7 @@ void Sequence::visit(Visitor &visitor) const
   setCurrent(visitor);
   if (visitor.preSequence()) {
     for (size_t i=0; i<childs.size(); i++) {
-      if (visitor.nextSequence(i)) {
+      if (visitor.nextSequence(i,childs[i]->id)) {
         childs[i]->visit(visitor);
         setCurrent(visitor);
       }
@@ -156,7 +156,7 @@ void Alternative::visit(Visitor &visitor) const
   setCurrent(visitor);
   if (visitor.preAlternative()) {
     for (size_t i=0; i<childs.size(); i++) {
-      if (visitor.nextAlternative(i)) {
+      if (visitor.nextAlternative(i,childs[i]->id)) {
         childs[i]->visit(visitor);
         setCurrent(visitor);
       }
@@ -288,6 +288,10 @@ expression_t ExpressionPool::newRepetition(expression_t a,int min,int max)
   }
   if (isEmpty(a)) {
     return a;
+  } else if (max==0)  { // min==max==0
+    return 0; // Empty
+  } else if ( (min==1)&&(max==1) ) {
+    return a;
   }
 
   auto node=std::make_unique<detail::Repetition>(min,max);
@@ -308,6 +312,7 @@ expression_t ExpressionPool::newSequence(expression_t a,expression_t b)
   auto node=std::make_unique<detail::Sequence>();
   get(a)->addTo(*node);
   get(b)->addTo(*node);
+  // assert(node->childs.size()>=2);
   node->calculate_hash();
 
   return add(std::move(node));

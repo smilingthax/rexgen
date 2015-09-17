@@ -8,8 +8,6 @@ namespace Regex {
 
 namespace detail {
 
-constexpr expression_t none=-1;
-
 using Visitor=ExpressionPool::Visitor;
 
 struct Empty;

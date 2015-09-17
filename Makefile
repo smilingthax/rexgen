@@ -1,5 +1,5 @@
-SOURCES=re-ast.cpp re-dump.cpp test-ast.cpp
-EXEC=test-ast
+SOURCES=re-ast.cpp re-builder.cpp re-dump.cpp test-ast.cpp test-deriv.cpp
+EXEC=test-ast test-deriv parser-ast
 PACKAGES=
 
 CPPFLAGS=-O3 -funroll-all-loops -finline-functions -Wall
@@ -40,6 +40,12 @@ clean:
 #$(EXEC): $(OBJECTS)
 #	$(CXX) -o $@ $^ $(LDFLAGS)
 
-test-ast: test-ast.o re-ast.o re-dump.o
+test-ast: test-ast.o re-ast.o re-builder.o re-dump.o
+	$(CXX) -o $@ $^ $(LDFLAGS)  $(CPPFLAGS) $(CXXFLAGS)
+
+parser-ast: stringparser.cpp parser-ast.cpp re-ast.o re-builder.o  re-dump.o
+	$(CXX) -o $@ $^ $(LDFLAGS)  $(CPPFLAGS) $(CXXFLAGS)
+
+test-deriv: stringparser.cpp test-deriv.o re-ast.o re-builder.o  re-dump.o
 	$(CXX) -o $@ $^ $(LDFLAGS)  $(CPPFLAGS) $(CXXFLAGS)
 
