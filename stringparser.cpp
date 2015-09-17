@@ -40,7 +40,10 @@ static inline bool isRep(char c)
 
 bool ReParser::term()
 {
-  if (*str=='(') { // group
+  if ( (!*str)||(*str==')')||(*str=='|') ) {
+    out.empty();
+    return true;
+  } else if (*str=='(') { // group
     str++;
     if (*str=='?') {
       str++;
@@ -69,6 +72,7 @@ bool ReParser::term()
     case '(': case ')':
     case '|': case '\\': case '*': case '+': case '?':
       out.literalValue(*str);
+      str++;
       break;
     default:
       fprintf(stderr,"Unsupported escape sequence: '\\%c'\n",*str);
@@ -79,11 +83,8 @@ bool ReParser::term()
     out.literalValue(*str);
     str++;
   } else {
-    if (isRep(*str)) {
-      fprintf(stderr,"Unexpected '%c'\n",*str);
-      return false; // or: just warning?
-    }
-    out.empty();
+    fprintf(stderr,"Unexpected '%c'\n",*str);
+    return false; // or, for isRep(*str): just warning?  [str++?]
   }
   return true;
 }
