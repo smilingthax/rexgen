@@ -13,6 +13,15 @@ if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
     printf("%d:[]",id());
   }
 
+  bool preRepetition(int min,int max) override {
+    printf(" (");
+    return true;
+  }
+
+  void postRepetition(int min,int max) override {
+    printf(")%d{%d,%d}",id(),min,max);
+  }
+
   bool preSequence() override {
     printf("%d ",id());
     return true;
@@ -40,15 +49,6 @@ if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
 
   void postAlternative() override {
     printf(")");
-  }
-
-  bool preRepetition(int min,int max) override {
-    printf(" (");
-    return true;
-  }
-
-  void postRepetition(int min,int max) override {
-    printf(")%d{%d,%d}",id(),min,max);
   }
 
   void end() override {

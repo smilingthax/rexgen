@@ -27,7 +27,7 @@ public:
 
   template <typename T>
   void literalValue(T&& lit) {
-    literal(new detail::LiteralWrapper<T>(std::forward<T>(lit)));
+    literal(new detail::LiteralWrapper<typename std::decay<T>::type>(std::forward<T>(lit)));
   }
   virtual void literal(detail::LiteralBase *lb) =0;
 

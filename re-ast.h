@@ -23,7 +23,7 @@ public:
 
   template <typename T>
   expression_t newLiteralValue(T&& lit) {
-    return newLiteral(new detail::LiteralWrapper<T>(std::forward<T>(lit)));
+    return newLiteral(new detail::LiteralWrapper<typename std::decay<T>::type>(std::forward<T>(lit)));
   }
   expression_t newLiteral(detail::LiteralBase *lb);
 
@@ -105,7 +105,7 @@ public:
   void seq(sequence_t &s) override;
   void end(sequence_t &s) override;
 
-  void begin(alternative_t &s) override;
+  void begin(alternative_t &a) override;
   void alt(alternative_t &a) override;
   void end(alternative_t &a) override;
 
@@ -116,7 +116,9 @@ public:
   }
 
 protected:
-  void ensureCurrent(bool value=true) const;
+  bool isNone() const;
+  bool isEmpty() const;
+  void ensureNone() const;
 
 private:
   ExpressionPool &pool;

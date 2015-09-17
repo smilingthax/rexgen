@@ -1,5 +1,5 @@
-#ifndef _RE_VISITOR_H
-#define _RE_VISITOR_H
+#ifndef _RE_STACKVISITOR_H
+#define _RE_STACKVISITOR_H
 
 #include "re-ast.h"
 
@@ -75,6 +75,7 @@ public:
     return true;
   }
   void endSequence() override {
+    // AST guarantee: there has been at least one nextSequence before this
     Builder_base::sequence_t s(std::move(current()));
     builder.end(s);
   }

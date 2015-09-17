@@ -329,7 +329,7 @@ expression_t ExpressionPool::newAlternative(expression_t a,expression_t b)
 
 const detail::Node *ExpressionPool::get(expression_t a) const
 {
-  if (a>=pool.size()) {
+  if (a>=pool.size()) { // also includes detail::none
     throw std::invalid_argument("bad expression_t handle");
   }
   return pool[a].get();
@@ -357,7 +357,7 @@ bool ExpressionPool::isEmpty(expression_t a) const
 void ExpressionPool::visit(expression_t a,Visitor &visitor) const
 {
   get(a)->visit(visitor);
-  visitor.current=-1;
+  visitor.current=detail::none;
   visitor.end();
 }
 

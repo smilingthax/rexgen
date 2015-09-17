@@ -8,6 +8,8 @@ namespace Regex {
 
 namespace detail {
 
+constexpr expression_t none=-1;
+
 using Visitor=ExpressionPool::Visitor;
 
 struct Empty;
@@ -35,7 +37,7 @@ struct Node {
 
   virtual void visit(Visitor &visitor) const =0;
 
-  expression_t id=-1;
+  expression_t id=none;
 
 protected:
   void setCurrent(Visitor &visitor) const {
