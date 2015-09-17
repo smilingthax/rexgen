@@ -23,17 +23,23 @@ void merge_sorted(A a_pos,A a_end, B b_pos,B b_end,
   while ( (a_pos<a_end)&&(b_pos<b_end) ) {
     if (comp(*a_pos,*b_pos)) {
       first(*a_pos);
+      a_pos++;
     } else if (comp(*b_pos,*a_pos)) {
       second(*b_pos);
+      b_pos++;
     } else {
       both(*a_pos,*b_pos);
+      a_pos++;
+      b_pos++;
     }
   }
   while (a_pos<a_end) {
     first(*a_pos);
+    a_pos++;
   }
   while (b_pos<b_end) {
-    second(*a_pos);
+    second(*b_pos);
+    b_pos++;
   }
 }
 

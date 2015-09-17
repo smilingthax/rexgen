@@ -3,6 +3,8 @@
 
 #include "re-ast.h"
 
+// CAVE: only works with same ExpressionPool as is visited over (-> expression ids)
+
 #include <assert.h>
 
 namespace Regex {

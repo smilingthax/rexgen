@@ -139,9 +139,16 @@ assert(a.is(access_alt));
     return; // current=none / "child";
   }
 
-  pool.get(current)->addTo(*node);
-  if (node->childs.size()==1) {
-    return; // dup (against current!)
+  if (isNone()) {
+    if (node->childs.size()==1) {
+      current=node->childs.front()->id;
+      return;
+    }
+  } else {
+    pool.get(current)->addTo(*node);
+    if (node->childs.size()==1) {
+      return; // dup (against current!)
+    }
   }
 assert(node->childs.size()>=2);
 

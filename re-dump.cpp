@@ -5,6 +5,10 @@ namespace Regex {
 
 class Dumper : public ExpressionPool::Visitor {
 public:
+  void empty() override {
+    printf("%d:(Empty)",id());
+  }
+
   void literal(const detail::LiteralBase *lb) override {
 // FIXME
 if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
@@ -12,7 +16,7 @@ if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
 } else if (auto c=dynamic_cast<const Regex::detail::LiteralWrapper<char> *>(lb)) {
     printf("%d:[%c]",id(),c->value);
 } else
-    printf("%d:[]",id());
+    printf("%d:[???]",id());
   }
 
   bool preRepetition(int min,int max,expression_t cid) override {
@@ -61,7 +65,11 @@ if (auto s=dynamic_cast<const detail::LiteralWrapper<std::string> *>(lb)) {
 void dump(ExpressionPool &pool,expression_t a)
 {
   Dumper d;
-  pool.visit(a,d);
+  if (a==detail::none) {
+    printf("(None)\n");
+  } else {
+    pool.visit(a,d);
+  }
 }
 
 } // namespace Regex
