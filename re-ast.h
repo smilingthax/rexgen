@@ -86,7 +86,7 @@ private:
   expression_t current=-1;
 };
 
-class ExpressionPool::Builder : public Builder_base {
+class ExpressionPool::Builder : public BuilderBase {
 public:
   Builder(ExpressionPool &pool); // must be out-of-line
 //Builder(Builder &&rhs); // FIXME?

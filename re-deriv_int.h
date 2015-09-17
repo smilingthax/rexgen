@@ -108,7 +108,7 @@ private:
 
   int min,max;
   expression_t cid;
-  Builder_base::sequence_t seq;
+  BuilderBase::sequence_t seq;
 };
 
 // δ(a SEQ b SEQ c ...) = δ(a) SEQ b SEQ c ...  ALT  nullable(a) SEQ δ(b) SEQ c ...  ALT  nullable(a SEQ b) SEQ δ(c) SEQ ...  ALT ...
@@ -140,11 +140,11 @@ struct Derivative<Predicate>::Sequence {
       dchilds.push_back(out.release());
     }
 
-    Builder_base::alternative_t alt;
+    BuilderBase::alternative_t alt;
     out.begin(alt);
     for (size_t i=0; i<dchilds.size(); i++) {
       out.alt(alt); // (i==0 is safely skipped by builder)
-      Builder_base::sequence_t seq;
+      BuilderBase::sequence_t seq;
       out.begin(seq);
       out.expression(dchilds[i]);
       for (size_t j=i+1; j<childs.size(); j++) {
@@ -192,7 +192,7 @@ private:
   ExpressionPool::Builder &out;
 
   bool nullable;
-  Builder_base::alternative_t alt;
+  BuilderBase::alternative_t alt;
 };
 
 } // namespace Regex

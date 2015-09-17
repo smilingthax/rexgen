@@ -43,7 +43,7 @@ private:
 
 class BuilderVisitor : public StackVisitor<Opaque> {
 public:
-  BuilderVisitor(Builder_base &builder) : builder(builder) {}
+  BuilderVisitor(BuilderBase &builder) : builder(builder) {}
 
   void empty() override {
     builder.empty();
@@ -62,13 +62,13 @@ public:
   }
 
   void beginSequence() override {
-    Builder_base::sequence_t s;
+    BuilderBase::sequence_t s;
     builder.begin(s);
     current()=std::move(s);
   }
   bool nextSequence(int idx,expression_t cid) override {
     if (idx>0) {
-      Builder_base::sequence_t s(std::move(current()));
+      BuilderBase::sequence_t s(std::move(current()));
       builder.seq(s);
       current()=std::move(s);
     }
@@ -76,25 +76,25 @@ public:
   }
   void endSequence() override {
     // AST guarantee: there has been at least one nextSequence before this
-    Builder_base::sequence_t s(std::move(current()));
+    BuilderBase::sequence_t s(std::move(current()));
     builder.end(s);
   }
 
   void beginAlternative() override {
-    Builder_base::alternative_t a;
+    BuilderBase::alternative_t a;
     builder.begin(a);
     current()=std::move(a);
   }
   bool nextAlternative(int idx,expression_t cid) override {
     if (idx>0) {
-      Builder_base::alternative_t a(std::move(current()));
+      BuilderBase::alternative_t a(std::move(current()));
       builder.alt(a);
       current()=std::move(a);
     }
     return true;
   }
   void endAlternative() override {
-    Builder_base::alternative_t a(std::move(current()));
+    BuilderBase::alternative_t a(std::move(current()));
     builder.end(a);
   }
 
@@ -103,7 +103,7 @@ public:
   }
 
 private:
-  Builder_base &builder;
+  BuilderBase &builder;
 };
 
 } // namespace Regex

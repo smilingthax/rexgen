@@ -4,10 +4,10 @@
 #include "re-builder_base.h"
 
 namespace {
-Regex::Builder_base::sequence_t::Accessor<std::string *> sb_seq;
-Regex::Builder_base::alternative_t::Accessor<std::string *> sb_alt;
+Regex::BuilderBase::sequence_t::Accessor<std::string *> sb_seq;
+Regex::BuilderBase::alternative_t::Accessor<std::string *> sb_alt;
 }
-class StringBuilder : public Regex::Builder_base {
+class StringBuilder : public Regex::BuilderBase {
 public:
   void empty() override {
     prec=PREC_TERM;

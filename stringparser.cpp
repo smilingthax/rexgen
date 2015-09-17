@@ -54,7 +54,7 @@ bool ReParser::term()
         return false;
       }
     } else { // capturing group
-      Regex::Builder_base::group_t g=out.grp();
+      Regex::BuilderBase::group_t g=out.grp();
       if (!group()) {
         return false;
       }
@@ -152,7 +152,7 @@ bool ReParser::repetition()
 
 bool ReParser::sequence()
 {
-  Regex::Builder_base::sequence_t s;
+  Regex::BuilderBase::sequence_t s;
   out.begin(s);
   while (repetition()) {
     if ( (!*str)||(*str==')')||(*str=='|') ) {
@@ -166,7 +166,7 @@ bool ReParser::sequence()
 
 bool ReParser::alternative()
 {
-  Regex::Builder_base::alternative_t a;
+  Regex::BuilderBase::alternative_t a;
   out.begin(a);
   while (sequence()) {
     if (*str!='|') {

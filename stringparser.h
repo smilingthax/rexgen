@@ -5,11 +5,11 @@
 
 class ReParser {
 public:
-  ReParser(Regex::Builder_base &out,const char *str) : out(out),str(str) {}
+  ReParser(Regex::BuilderBase &out,const char *str) : out(out),str(str) {}
 
   bool operator()();
 
-  static bool run(Regex::Builder_base &out,const char *str) {
+  static bool run(Regex::BuilderBase &out,const char *str) {
     return ReParser(out,str)();
   }
 
@@ -22,7 +22,7 @@ protected:
   bool alternative();
 
 private:
-  Regex::Builder_base &out;
+  Regex::BuilderBase &out;
   const char *str;
 };
 

@@ -6,7 +6,7 @@
 
 namespace Regex {
 
-class Builder_base {
+class BuilderBase {
 public:
   struct group_t : Opaque {
     group_t() =default;
@@ -21,7 +21,7 @@ public:
     alternative_t(Opaque &&o) : Opaque(std::move(o)) { }
   };
 
-  virtual ~Builder_base() =default;
+  virtual ~BuilderBase() =default;
 
   virtual void empty() =0;
 
