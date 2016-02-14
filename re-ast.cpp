@@ -246,7 +246,7 @@ void Alternative::addTo(Alternative &a) const
                  result.push_back(a);
                },
                [&result](const Node *b) { // only second
-                  result.push_back(b);
+                 result.push_back(b);
                },
                [&result](const Node *a,const Node *b) { // both
                  result.push_back(a);
